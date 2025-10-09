@@ -295,7 +295,7 @@ def main():
                  
             if len(x_trim) > 0:
                 if idx == 0:
-                    ax.plot(x_trim, y_trim, linestyle = '--', color = 'k', label = 'GO Curves')
+                    ax.plot(x_trim, y_trim, linestyle = '--', color = 'k', label = 'MAGO Curves')
                 else:
                     ax.plot(x_trim, y_trim, linestyle = '--', color = 'k')
         
@@ -334,7 +334,7 @@ def main():
         ax.grid(True)
         ax.set_xlim(TW_min, TW_max)
         ax.set_ylim(HW_min, HW_max)
-        ax.legend(fontsize='large', title='Legends', title_fontsize='x-large', loc='lower right')
+        ax.legend(fontsize='large', title='Legend', title_fontsize='x-large', loc='lower right')
         
         # Set title of the app
         st.title("Polynomial-Fitted MAGO Calculator")
@@ -428,6 +428,7 @@ def main():
       
 if __name__ == "__main__":
     main()
+
 
 
 
