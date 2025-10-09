@@ -225,7 +225,7 @@ def main():
             x_trim = x_vals[mask]
             y_trim = y_vals[mask]
             
-            ax.plot(x_trim, y_trim, color="black", linewidth=2, label = 'No Restriction Curve')
+            ax.plot(x_trim, y_trim, color="black", linewidth=2, label = 'No MAGO Restriction Curve')
       
         if no_mago_line:
             no_mago_curve = no_mago_line[0]["func"](tw)
@@ -428,5 +428,6 @@ def main():
       
 if __name__ == "__main__":
     main()
+
 
 
