@@ -332,8 +332,22 @@ def main():
         ax.set_ylabel("HW Elevation (feet NAVD88)", fontsize = 12)
         ax.set_title(f"Polynomial-Fitted MAGO Curves for {selected_structure}", fontsize = 16)
         ax.grid(True)
-        ax.set_xlim(TW_min, TW_max)
-        ax.set_ylim(HW_min, HW_max)
+        # ax.set_xlim(TW_min, TW_max)
+        # ax.set_ylim(HW_min, HW_max)
+        if tw_point < TW_min:    
+            ax.set_xlim(tw_point - 0.5, TW_max)
+        elif tw_point > TW_max:
+            ax.set_xlim(TW_min, tw_point + 0.5)
+        else:
+            ax.set_xlim(TW_min, TW_max)
+        
+        if hw_point < HW_min:    
+            ax.set_ylim(hw_point - 0.5, HW_max)
+        elif hw_point > HW_max:
+            ax.set_ylim(HW_min, hw_point + 0.5)
+        else:
+            ax.set_ylim(HW_min, HW_max)
+        
         ax.legend(fontsize='large', title='Legend', title_fontsize='x-large', loc='lower right')
         
         # Set title of the app
@@ -428,6 +442,7 @@ def main():
       
 if __name__ == "__main__":
     main()
+
 
 
 
