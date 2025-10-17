@@ -128,9 +128,18 @@ def main():
         df_domain = pd.read_csv(os.path.join(workdir, 'domain.csv'))
         logging.info(df_domain)
         
+        df_dailydata = pd.read_csv(os.path.join(workdir, 'daily_data.csv'))
+        logging.info(df_dailydata)
+        
         st.sidebar.header("Select Structure")
         structurelist = df_sta['Structure'].unique()
         selected_structure = st.sidebar.selectbox("Choose a structure:", structurelist, key='structure')
+        
+
+        # Get daily data for the selected structure
+        filtered_dailydata = df_dailydata[df_dailydata['Structure'] == selected_structure]
+        daily_hw = filtered_dailydata['Headwater (ft-NAVD88)'].iloc[0]
+        daily_tw = filtered_dailydata['Tailwater (ft-NAVD88)'].iloc[0]
         
         # --- Initialize session state ---
         if "last_structure" not in st.session_state:
@@ -140,27 +149,28 @@ def main():
             st.session_state.uploader_key = "file_uploader"
         
         if "hw_point" not in st.session_state:
-            st.session_state.hw_point = 0.00
+            st.session_state.hw_point = daily_hw
         
         if "tw_point" not in st.session_state:
-            st.session_state.tw_point = 0.00
+            st.session_state.tw_point = daily_tw
         
         # --- Reset function ---
         def reset_inputs():
-            st.session_state.hw_point = 0.00
-            st.session_state.tw_point = 0.00
+            st.session_state.hw_point = daily_hw
+            st.session_state.tw_point = daily_tw
             st.session_state.uploader_key = str(datetime.datetime.now())
             st.session_state.last_structure = selected_structure
         
         # --- Auto reset when structure changes ---
         if selected_structure != st.session_state.last_structure:
             st.session_state.update({
-                "hw_point": 0.00,
-                "tw_point": 0.00,
+                "hw_point": daily_hw,
+                "tw_point": daily_tw,
                 "uploader_key": str(datetime.datetime.now()),
                 "last_structure": selected_structure
             })
-            st.rerun()
+            st.rerun()        
+       
         
         # --- Filter datasets ---
         filtered_go_coeff = df_go_coeff[df_go_coeff['Structure'] == selected_structure]
@@ -442,6 +452,7 @@ def main():
       
 if __name__ == "__main__":
     main()
+
 
 
 
