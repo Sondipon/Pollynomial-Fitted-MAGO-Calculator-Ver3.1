@@ -155,6 +155,10 @@ def main():
             st.session_state.tw_point = daily_tw
         
         # --- Reset function ---
+        def current_conditions():
+            st.session_state.hw_point = daily_hw
+            st.session_state.tw_point = daily_tw
+        
         def reset_inputs():
             st.session_state.hw_point = daily_hw
             st.session_state.tw_point = daily_tw
@@ -183,7 +187,8 @@ def main():
         TW_min = filtered_df_domain['TW_min_NAVD88'].iloc[0]
         
         # --- Sidebar inputs ---
-        st.sidebar.header("Enter HW & TW Conditions")
+        #st.sidebar.header("Enter HW & TW Conditions")
+        st.sidebar.button("Current Conditions", on_click=current_conditions)
         
         tw_point = st.sidebar.number_input(
             "Tailwater Level (TW)", step=0.01, key="tw_point"
@@ -452,6 +457,7 @@ def main():
       
 if __name__ == "__main__":
     main()
+
 
 
 
