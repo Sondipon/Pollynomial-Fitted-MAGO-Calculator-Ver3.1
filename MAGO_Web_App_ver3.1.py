@@ -100,7 +100,17 @@ def interpolate_value_clamped(tw_point, hw_point, curves, no_mago_line):
         # Fallback (should not happen)
         return np.nan
 
-
+def get_daily_data(selected_structure, workdir):
+    df_dailydata = pd.read_csv(os.path.join(workdir, 'daily_data.csv'))
+    filtered_dailydata = df_dailydata[df_dailydata['Structure'] == selected_structure]
+    
+    daily_hw = filtered_dailydata['Headwater (ft-NAVD88)'].iloc[0]
+    daily_tw = filtered_dailydata['Tailwater (ft-NAVD88)'].iloc[0]
+    dttm = filtered_dailydata['Date and Time'].iloc[0]
+    dt = datetime.datetime.strptime(dttm, "%Y-%m-%d %H:%M:%S")
+    fm_dttm = dt.strftime("%m/%d/%Y %H:%M")
+    
+    return daily_hw, daily_tw, fm_dttm
 
 def main():
     try:
@@ -137,9 +147,7 @@ def main():
         
 
         # Get daily data for the selected structure
-        filtered_dailydata = df_dailydata[df_dailydata['Structure'] == selected_structure]
-        daily_hw = filtered_dailydata['Headwater (ft-NAVD88)'].iloc[0]
-        daily_tw = filtered_dailydata['Tailwater (ft-NAVD88)'].iloc[0]
+        daily_hw, daily_tw, fm_dttm = get_daily_data(selected_structure, workdir)
         
         # --- Initialize session state ---
         if "last_structure" not in st.session_state:
@@ -156,10 +164,12 @@ def main():
         
         # --- Reset function ---
         def current_conditions():
+            daily_hw, daily_tw, fm_dttm = get_daily_data(st.session_state.last_structure, workdir)
             st.session_state.hw_point = daily_hw
             st.session_state.tw_point = daily_tw
-        
+            
         def reset_inputs():
+            daily_hw, daily_tw, fm_dttm = get_daily_data(selected_structure, workdir)
             st.session_state.hw_point = daily_hw
             st.session_state.tw_point = daily_tw
             st.session_state.uploader_key = str(datetime.datetime.now())
@@ -167,14 +177,14 @@ def main():
         
         # --- Auto reset when structure changes ---
         if selected_structure != st.session_state.last_structure:
+            daily_hw, daily_tw, fm_dttm = get_daily_data(selected_structure, workdir)
             st.session_state.update({
                 "hw_point": daily_hw,
                 "tw_point": daily_tw,
                 "uploader_key": str(datetime.datetime.now()),
                 "last_structure": selected_structure
             })
-            st.rerun()        
-       
+            st.rerun()
         
         # --- Filter datasets ---
         filtered_go_coeff = df_go_coeff[df_go_coeff['Structure'] == selected_structure]
@@ -187,8 +197,8 @@ def main():
         TW_min = filtered_df_domain['TW_min_NAVD88'].iloc[0]
         
         # --- Sidebar inputs ---
-        #st.sidebar.header("Enter HW & TW Conditions")
         st.sidebar.button("Current Conditions", on_click=current_conditions)
+        #st.sidebar.header("Enter HW & TW Conditions")
         
         tw_point = st.sidebar.number_input(
             "Tailwater Level (TW)", step=0.01, key="tw_point"
@@ -362,7 +372,7 @@ def main():
             ax.set_ylim(HW_min, hw_point + 0.5)
         else:
             ax.set_ylim(HW_min, HW_max)
-        
+            
         ax.legend(fontsize='large', title='Legend', title_fontsize='x-large', loc='lower right')
         
         # Set title of the app
@@ -372,8 +382,8 @@ def main():
         if isinstance(annotation, str):
             st.markdown(
                 f"""
-                <h3 style="font-size:20px; text-align:center; color:#2c3e50;">
-                    Calculated Maximum Allowable Gate Opening (MAGO) for {selected_structure}: {annotation}
+                <h3 style="font-size:18px; text-align:center; color:#2c3e50;">
+                    Calculated Maximum Allowable Gate Opening (MAGO) for {selected_structure}: {annotation} @ {fm_dttm}
                 </h3>
                 """,
                 unsafe_allow_html=True
@@ -381,8 +391,8 @@ def main():
         else:
             st.markdown(
                 f"""
-                <h3 style="font-size:20px; text-align:center; color:#2c3e50;">
-                    Calculated Maximum Allowable Gate Opening (MAGO) for {selected_structure}: {round(annotation, 1)} feet
+                <h3 style="font-size:18px; text-align:center; color:#2c3e50;">
+                    Calculated Maximum Allowable Gate Opening (MAGO) for {selected_structure}: {round(annotation, 1)} feet @ {fm_dttm}
                 </h3>
                 """,
                 unsafe_allow_html=True
@@ -457,10 +467,5 @@ def main():
       
 if __name__ == "__main__":
     main()
-
-
-
-
-
 
 
